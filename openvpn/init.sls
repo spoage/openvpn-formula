@@ -129,12 +129,15 @@ openvpn_config_{{ type }}_{{ name }}_{{ client }}_client_config:
 {% endfor %}
 {% endif %}
 {% endfor %}
-
+	
+{% if salt['openvpn_util.uses_systemd'] %}
+{% for name, config in salt['pillar.get']('openvpn:server', {}).iteritems() %}
 # Ensure openvpn service is running and autostart is enabled
-openvpn_service:
+openvpn_service_{{ name }}:
   service.running:
-    - name: {{ map.service }}
+    - name: {{ map.service }}@{{ name }}
     - enable: True
     - require:
       - pkg: openvpn_pkgs
-
+{% endfor %}
+{% endif %}
